@@ -1,0 +1,64 @@
+<%- include('../partials/header') %>
+
+<div class="auth-page">
+  <div class="auth-visual">
+    <div class="auth-visual-content">
+      <div class="auth-logo">🌿 WildGuard</div>
+      <h2>Join the global<br>conservation movement.</h2>
+      <div class="auth-animals">🦓 🐋 🦜 🐢 🌳</div>
+    </div>
+  </div>
+  <div class="auth-form-side">
+    <div class="auth-box">
+      <h1>Create account</h1>
+      <p class="auth-sub">Start your conservation journey</p>
+      <form action="/auth/signup" method="POST" enctype="multipart/form-data" class="auth-form">
+        <div class="form-group avatar-upload">
+          <label>Profile Photo <span class="optional">(optional)</span></label>
+          <div class="avatar-preview-wrap">
+            <img src="/images/default-avatar.svg" alt="Preview" id="avatarPreview" class="avatar-preview">
+            <input type="file" name="avatar" id="avatarInput" accept="image/*" onchange="previewAvatar(this)">
+            <label for="avatarInput" class="avatar-btn">Choose Photo</label>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Username *</label>
+            <input type="text" name="username" placeholder="coolconservationist" required minlength="3">
+          </div>
+          <div class="form-group">
+            <label>Email *</label>
+            <input type="email" name="email" placeholder="you@example.com" required>
+          </div>
+        </div>
+        <div class="form-row">
+          <div class="form-group">
+            <label>Password *</label>
+            <input type="password" name="password" placeholder="Min. 6 characters" required minlength="6">
+          </div>
+          <div class="form-group">
+            <label>Confirm Password *</label>
+            <input type="password" name="confirmPassword" placeholder="Repeat password" required>
+          </div>
+        </div>
+        <div class="form-group">
+          <label>Bio <span class="optional">(optional)</span></label>
+          <textarea name="bio" placeholder="Tell us about your passion for wildlife..." rows="2"></textarea>
+        </div>
+        <button type="submit" class="btn btn-primary btn-full">Create Account</button>
+      </form>
+      <p class="auth-switch">Already have an account? <a href="/auth/login">Log in</a></p>
+    </div>
+  </div>
+</div>
+
+<script>
+function previewAvatar(input) {
+  if (input.files && input.files[0]) {
+    const reader = new FileReader();
+    reader.onload = e => document.getElementById('avatarPreview').src = e.target.result;
+    reader.readAsDataURL(input.files[0]);
+  }
+}
+</script>
+<%- include('../partials/footer') %>
