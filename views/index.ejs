@@ -1,0 +1,101 @@
+<%- include('partials/header') %>
+
+<section class="hero">
+  <div class="hero-bg"></div>
+  <div class="hero-content">
+    <div class="hero-eyebrow">🦁 Wildlife Conservation Platform</div>
+    <h1 class="hero-title">Protect the<br><span class="accent">Wild World</span></h1>
+    <p class="hero-subtitle">Join thousands of conservationists tracking endangered species, participating in events, and making a real difference for our planet's wildlife.</p>
+    <div class="hero-actions">
+      <a href="/events" class="btn btn-primary">Explore Events</a>
+      <a href="/species" class="btn btn-outline">View Species</a>
+    </div>
+    <div class="hero-stats">
+      <div class="stat"><span class="stat-num"><%= stats.events %>+</span><span class="stat-label">Active Events</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num"><%= stats.species %>+</span><span class="stat-label">Species Tracked</span></div>
+      <div class="stat-divider"></div>
+      <div class="stat"><span class="stat-num">24/7</span><span class="stat-label">Monitoring</span></div>
+    </div>
+  </div>
+  <div class="hero-visual">
+    <div class="hero-card card-float-1">🐘 Elephant | Endangered</div>
+    <div class="hero-card card-float-2">🦅 Eagle | Vulnerable</div>
+    <div class="hero-card card-float-3">🐆 Leopard | Near Threatened</div>
+  </div>
+</section>
+
+<section class="section-events">
+  <div class="container">
+    <div class="section-header">
+      <h2>Upcoming <span class="accent">Events</span></h2>
+      <a href="/events" class="section-link">View all →</a>
+    </div>
+    <div class="events-grid">
+      <% if (upcomingEvents.length === 0) { %>
+        <div class="empty-state">
+          <p>No upcoming events yet. <% if (user && user.role === 'admin') { %><a href="/events/admin/create">Create one</a><% } %></p>
+        </div>
+      <% } else { %>
+        <% upcomingEvents.forEach(event => { %>
+          <div class="event-card">
+            <div class="event-img" style="background-image: url('<%= event.image %>')">
+              <span class="event-badge"><%= event.category %></span>
+            </div>
+            <div class="event-body">
+              <p class="event-date">📅 <%= event.date.toDateString() %></p>
+              <h3><%= event.title %></h3>
+              <p class="event-location">📍 <%= event.location %></p>
+              <div class="event-footer">
+                <span class="spots"><%= event.capacity - event.registeredUsers.length %> spots left</span>
+                <a href="/events/<%= event._id %>" class="btn btn-sm">Details</a>
+              </div>
+            </div>
+          </div>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<section class="section-species">
+  <div class="container">
+    <div class="section-header">
+      <h2>Featured <span class="accent">Species</span></h2>
+      <a href="/species" class="section-link">View all →</a>
+    </div>
+    <div class="species-grid">
+      <% if (featuredSpecies.length === 0) { %>
+        <div class="empty-state"><p>No species in our directory yet.</p></div>
+      <% } else { %>
+        <% featuredSpecies.forEach(sp => { %>
+          <a href="/species/<%= sp._id %>" class="species-card">
+            <div class="species-img" style="background-image: url('<%= sp.image %>')"></div>
+            <div class="species-body">
+              <span class="status-badge status-<%= sp.conservationStatus.toLowerCase().replace(/ /g,'-') %>"><%= sp.conservationStatus %></span>
+              <h3><%= sp.name %></h3>
+              <p class="species-sci"><em><%= sp.scientificName || '' %></em></p>
+              <p class="species-category"><%= sp.category %> · <%= sp.habitat %></p>
+            </div>
+          </a>
+        <% }) %>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<section class="section-cta">
+  <div class="container">
+    <div class="cta-box">
+      <h2>Ready to make a difference?</h2>
+      <p>Join our growing community of wildlife conservationists.</p>
+      <% if (!user) { %>
+        <a href="/auth/signup" class="btn btn-primary btn-lg">Join WildGuard Free</a>
+      <% } else { %>
+        <a href="/species/report/new" class="btn btn-primary btn-lg">Report a Species Sighting</a>
+      <% } %>
+    </div>
+  </div>
+</section>
+
+<%- include('partials/footer') %>

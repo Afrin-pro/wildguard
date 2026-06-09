@@ -1,0 +1,32 @@
+</main>
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-brand">
+      <span class="logo-icon">🌿</span>
+      <span class="logo-text">WildGuard</span>
+      <p>Protecting wildlife, one species at a time.</p>
+    </div>
+    <div class="footer-links">
+      <a href="/events">Events</a>
+      <a href="/species">Species</a>
+      <a href="/auth/signup">Join Us</a>
+    </div>
+  </div>
+  <div class="footer-bottom">
+    <p>© 2025 WildGuard Conservation Initiative</p>
+  </div>
+</footer>
+
+<script src="/js/app.js"></script>
+<% if (user) { %>
+<script>
+  fetch('/notifications/count').then(r => r.json()).then(d => {
+    if (d.count > 0) {
+      const badge = document.getElementById('notifBadge');
+      if (badge) { badge.textContent = d.count; badge.style.display = 'inline-flex'; }
+    }
+  });
+</script>
+<% } %>
+</body>
+</html>

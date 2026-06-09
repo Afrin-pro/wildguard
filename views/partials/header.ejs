@@ -1,0 +1,56 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@400;700;900&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+<nav class="navbar">
+  <a href="/" class="nav-logo">
+    <span class="logo-icon">🌿</span>
+    <span class="logo-text">WildGuard</span>
+  </a>
+  <div class="nav-links">
+    <a href="/events" class="nav-link">Events</a>
+    <a href="/species" class="nav-link">Species</a>
+    <a href="/sightings" class="nav-link">🗺️ Sightings</a>
+    <% if (user) { %>
+      <a href="/adoptions" class="nav-link">💚 Adopt</a>
+      <a href="/notifications" class="nav-link notif-link" id="notifLink">
+        Notifications
+        <span class="notif-badge" id="notifBadge" style="display:none">0</span>
+      </a>
+      <% if (user.role === 'admin') { %>
+        <a href="/admin" class="nav-link admin-link">Admin Panel</a>
+      <% } %>
+      <div class="nav-user" onclick="toggleDropdown(event)">
+        <img src="<%= user.avatar %>" alt="<%= user.username %>" class="nav-avatar">
+        <div class="nav-dropdown">
+          <a href="/profile">My Profile</a>
+          <a href="/adoptions">My Adoptions</a>
+          <a href="/sightings/report">Report Sighting</a>
+          <form action="/auth/logout" method="POST">
+            <button type="submit">Logout</button>
+          </form>
+        </div>
+      </div>
+    <% } else { %>
+      <a href="/auth/login" class="nav-link">Login</a>
+      <a href="/auth/signup" class="btn btn-primary nav-cta">Join Us</a>
+    <% } %>
+  </div>
+  <button class="nav-toggle" onclick="toggleNav()">☰</button>
+</nav>
+
+<% if (success) { %>
+  <div class="flash flash-success"><%= success %></div>
+<% } %>
+<% if (error) { %>
+  <div class="flash flash-error"><%= error %></div>
+<% } %>
+
+<main>
