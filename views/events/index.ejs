@@ -1,0 +1,65 @@
+<%- include('../partials/header') %>
+
+<div class="page-hero page-hero-green">
+  <div class="container">
+    <h1>Conservation <span class="accent">Events</span></h1>
+    <p>Join hands-on events that make a real impact for wildlife.</p>
+    <% if (user && user.role === 'admin') { %>
+      <a href="/events/admin/create" class="btn btn-primary">+ Create Event</a>
+    <% } %>
+  </div>
+</div>
+
+<div class="container page-content">
+  <div class="filter-bar">
+    <form action="/events" method="GET" class="filter-form">
+      <input type="text" name="search" placeholder="Search events..." value="<%= search || '' %>">
+      <select name="category">
+        <option value="">All Categories</option>
+        <% ['Conservation','Cleanup','Research','Education','Fundraiser'].forEach(c => { %>
+          <option value="<%= c %>" <%= category === c ? 'selected' : '' %>><%= c %></option>
+        <% }) %>
+      </select>
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <a href="/events" class="btn btn-outline">Clear</a>
+    </form>
+  </div>
+
+  <div class="events-grid events-grid-full">
+    <% if (events.length === 0) { %>
+      <div class="empty-state full">
+        <div class="empty-icon">🔍</div>
+        <h3>No events found</h3>
+        <p>Try different filters or check back later.</p>
+      </div>
+    <% } else { %>
+      <% events.forEach(event => { %>
+        <div class="event-card">
+          <div class="event-img" style="background-image: url('<%= event.image %>')">
+            <span class="event-badge"><%= event.category %></span>
+            <% if (new Date(event.date) < new Date()) { %><span class="event-past-badge">Past</span><% } %>
+          </div>
+          <div class="event-body">
+            <p class="event-date">📅 <%= event.date.toDateString() %></p>
+            <h3><%= event.title %></h3>
+            <p class="event-location">📍 <%= event.location %></p>
+            <p class="event-desc"><%= event.description.substring(0, 100) %>...</p>
+            <div class="event-footer">
+              <span class="spots"><%= event.capacity - event.registeredUsers.length %> / <%= event.capacity %> spots</span>
+              <div class="event-actions">
+                <a href="/events/<%= event._id %>" class="btn btn-sm">Details</a>
+                <% if (user && user.role === 'admin') { %>
+                  <form action="/events/<%= event._id %>/delete" method="POST" onsubmit="return confirm('Delete this event?')">
+                    <button class="btn btn-sm btn-danger">Delete</button>
+                  </form>
+                <% } %>
+              </div>
+            </div>
+          </div>
+        </div>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,68 @@
+<%- include('../partials/header') %>
+
+<div class="container event-show">
+  <a href="/events" class="btn btn-outline btn-sm" style="margin-bottom:1.5rem;display:inline-flex">← Back to Events</a>
+  <div class="event-show-grid">
+    <div>
+      <div class="event-show-img" style="background-image: url('<%= event.image %>')"></div>
+      <div style="background:white;border-radius:12px;padding:1.5rem;box-shadow:var(--shadow)">
+        <span class="event-badge" style="margin-bottom:0.8rem;display:inline-block"><%= event.category %></span>
+        <h1 style="font-family:'Playfair Display',serif;font-size:2rem;margin-bottom:1rem"><%= event.title %></h1>
+        <p style="line-height:1.7;color:#444"><%= event.description %></p>
+        <% if (user && user.role === 'admin') { %>
+          <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid #eee">
+            <form action="/events/<%= event._id %>/delete" method="POST" onsubmit="return confirm('Delete this event permanently?')">
+              <button class="btn btn-danger btn-sm">Delete Event</button>
+            </form>
+          </div>
+        <% } %>
+      </div>
+    </div>
+
+    <div>
+      <div class="event-detail-card">
+        <h3>Event Details</h3>
+        <div class="detail-row"><span>📅</span><div><strong>Date:</strong> <%= event.date.toDateString() %></div></div>
+        <div class="detail-row"><span>📍</span><div><strong>Location:</strong> <%= event.location %></div></div>
+        <div class="detail-row"><span>👥</span><div><strong>Capacity:</strong> <%= event.registeredUsers.length %> / <%= event.capacity %> registered</div></div>
+        <div class="capacity-bar">
+          <div class="capacity-fill" style="width:<%= Math.round((event.registeredUsers.length / event.capacity) * 100) %>%"></div>
+        </div>
+        <div class="detail-row"><span>🏷️</span><div><strong>Category:</strong> <%= event.category %></div></div>
+        <div class="detail-row"><span>👤</span><div><strong>Organized by:</strong> <%= event.createdBy ? event.createdBy.username : 'Admin' %></div></div>
+
+        <% if (user) { %>
+          <form action="/events/<%= event._id %>/register" method="POST" style="margin-top:1.2rem">
+            <% if (isRegistered) { %>
+              <button class="btn btn-outline btn-full" style="border-color:var(--danger);color:var(--danger)">Unregister from Event</button>
+              <p style="text-align:center;font-size:0.82rem;color:var(--text-muted);margin-top:6px">You are registered ✓</p>
+            <% } else if (event.registeredUsers.length >= event.capacity) { %>
+              <button class="btn btn-full" disabled style="background:#ccc;cursor:not-allowed">Event Full</button>
+            <% } else { %>
+              <button class="btn btn-primary btn-full">Register for Event</button>
+              <p style="text-align:center;font-size:0.82rem;color:var(--text-muted);margin-top:6px"><%= event.capacity - event.registeredUsers.length %> spots remaining</p>
+            <% } %>
+          </form>
+        <% } else { %>
+          <a href="/auth/login" class="btn btn-primary btn-full" style="margin-top:1.2rem;text-align:center">Login to Register</a>
+        <% } %>
+      </div>
+
+      <% if (event.registeredUsers && event.registeredUsers.length > 0) { %>
+        <div class="event-detail-card" style="margin-top:1.2rem">
+          <h3>Attendees (<%= event.registeredUsers.length %>)</h3>
+          <div class="attendees">
+            <% event.registeredUsers.forEach(u => { %>
+              <div class="attendee">
+                <img src="<%= u.avatar %>" alt="<%= u.username %>">
+                <span><%= u.username %></span>
+              </div>
+            <% }) %>
+          </div>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
