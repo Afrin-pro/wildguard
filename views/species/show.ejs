@@ -1,0 +1,54 @@
+<%- include('../partials/header') %>
+
+<div class="container species-show">
+  <a href="/species" class="btn btn-outline btn-sm" style="margin-bottom:1.5rem;display:inline-flex">← Back to Species</a>
+
+  <div class="species-show-grid">
+    <div>
+      <div class="species-show-img" style="background-image: url('<%= species.image %>')"></div>
+    </div>
+
+    <div class="species-show-info">
+      <span class="status-badge status-<%= species.conservationStatus.toLowerCase().replace(/ /g,'-') %>">
+        <%= species.conservationStatus %>
+      </span>
+      <h1><%= species.name %></h1>
+      <p class="sci"><em><%= species.scientificName || 'Scientific name not recorded' %></em></p>
+
+      <div class="species-meta">
+        <span class="meta-tag">🏷️ <%= species.category %></span>
+        <span class="meta-tag">🌍 <%= species.habitat %></span>
+        <% if (species.population) { %>
+          <span class="meta-tag">📊 Population: <%= species.population %></span>
+        <% } %>
+      </div>
+
+      <p class="species-desc"><%= species.description %></p>
+
+      <% if (species.threats && species.threats.length > 0) { %>
+        <h3 style="margin-bottom:0.8rem;font-size:1rem;font-weight:600">Known Threats</h3>
+        <div class="threats-list">
+          <% species.threats.forEach(t => { %>
+            <span class="threat-tag">⚠️ <%= t %></span>
+          <% }) %>
+        </div>
+      <% } %>
+
+      <% if (species.addedBy) { %>
+        <p style="margin-top:1.5rem;font-size:0.85rem;color:var(--text-muted)">
+          Reported by <strong><%= species.addedBy.username %></strong>
+        </p>
+      <% } %>
+
+      <% if (user && user.role === 'admin') { %>
+        <div style="margin-top:1.5rem;padding-top:1rem;border-top:1px solid #eee;">
+          <form action="/admin/species/<%= species._id %>/delete" method="POST" onsubmit="return confirm('Remove this species?')">
+            <button class="btn btn-danger btn-sm">Remove Species</button>
+          </form>
+        </div>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

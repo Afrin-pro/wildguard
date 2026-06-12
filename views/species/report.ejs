@@ -1,0 +1,79 @@
+<%- include('../partials/header') %>
+
+<div class="container form-page">
+  <h1>Report a Species</h1>
+  <p class="form-sub">Spotted a wildlife species? Submit it for admin review and help grow our conservation database.</p>
+
+  <div class="form-card">
+    <form action="/species/report/new" method="POST">
+      <div class="form-row">
+        <div class="form-group">
+          <label>Common Name *</label>
+          <input type="text" name="name" placeholder="e.g. Bengal Tiger" required>
+        </div>
+        <div class="form-group">
+          <label>Scientific Name</label>
+          <input type="text" name="scientificName" placeholder="e.g. Panthera tigris tigris">
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Category *</label>
+          <select name="category" required>
+            <option value="">Select category...</option>
+            <% ['Mammal','Bird','Reptile','Amphibian','Fish','Invertebrate','Plant'].forEach(c => { %>
+              <option value="<%= c %>"><%= c %></option>
+            <% }) %>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Conservation Status *</label>
+          <select name="conservationStatus" required>
+            <option value="">Select status...</option>
+            <% ['Least Concern','Near Threatened','Vulnerable','Endangered','Critically Endangered','Extinct in Wild','Extinct'].forEach(s => { %>
+              <option value="<%= s %>"><%= s %></option>
+            <% }) %>
+          </select>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Habitat *</label>
+        <input type="text" name="habitat" placeholder="e.g. Tropical rainforests of South Asia" required>
+      </div>
+
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea name="description" rows="4" placeholder="Describe the species, its characteristics, behavior, and conservation importance..." required></textarea>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Estimated Population</label>
+          <input type="text" name="population" placeholder="e.g. ~3,900 in the wild">
+        </div>
+        <div class="form-group">
+          <label>Image URL</label>
+          <input type="url" name="image" placeholder="https://example.com/image.jpg">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Threats <span class="optional">(comma-separated)</span></label>
+        <input type="text" name="threats" placeholder="e.g. Habitat loss, Poaching, Climate change">
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Submit for Review</button>
+        <a href="/species" class="btn btn-outline">Cancel</a>
+      </div>
+
+      <p style="margin-top:1rem;font-size:0.85rem;color:var(--text-muted)">
+        ℹ️ Your submission will be reviewed by an admin before appearing publicly.
+      </p>
+    </form>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

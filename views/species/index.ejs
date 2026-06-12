@@ -1,0 +1,59 @@
+<%- include('../partials/header') %>
+
+<div class="page-hero">
+  <div class="container">
+    <h1>Species <span class="accent">Directory</span></h1>
+    <p>Track and learn about wildlife around the world.</p>
+    <% if (user) { %>
+      <a href="/species/report/new" class="btn btn-primary">+ Report a Species</a>
+    <% } %>
+  </div>
+</div>
+
+<div class="container page-content">
+  <div class="filter-bar">
+    <form action="/species" method="GET" class="filter-form">
+      <input type="text" name="search" placeholder="Search species..." value="<%= search || '' %>">
+      <select name="category">
+        <option value="">All Categories</option>
+        <% ['Mammal','Bird','Reptile','Amphibian','Fish','Invertebrate','Plant'].forEach(c => { %>
+          <option value="<%= c %>" <%= category === c ? 'selected' : '' %>><%= c %></option>
+        <% }) %>
+      </select>
+      <select name="status">
+        <option value="">All Statuses</option>
+        <% ['Least Concern','Near Threatened','Vulnerable','Endangered','Critically Endangered','Extinct in Wild','Extinct'].forEach(s => { %>
+          <option value="<%= s %>" <%= status === s ? 'selected' : '' %>><%= s %></option>
+        <% }) %>
+      </select>
+      <button type="submit" class="btn btn-primary">Filter</button>
+      <a href="/species" class="btn btn-outline">Clear</a>
+    </form>
+  </div>
+
+  <div class="species-grid">
+    <% if (species.length === 0) { %>
+      <div class="empty-state full">
+        <div class="empty-icon">🔍</div>
+        <h3>No species found</h3>
+        <p>Try different filters or <a href="/species/report/new">report a new species</a>.</p>
+      </div>
+    <% } else { %>
+      <% species.forEach(sp => { %>
+        <a href="/species/<%= sp._id %>" class="species-card">
+          <div class="species-img" style="background-image: url('<%= sp.image %>')"></div>
+          <div class="species-body">
+            <span class="status-badge status-<%= sp.conservationStatus.toLowerCase().replace(/ /g,'-') %>">
+              <%= sp.conservationStatus %>
+            </span>
+            <h3><%= sp.name %></h3>
+            <p class="species-sci"><em><%= sp.scientificName || '' %></em></p>
+            <p class="species-category"><%= sp.category %> · <%= sp.habitat %></p>
+          </div>
+        </a>
+      <% }) %>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
