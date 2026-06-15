@@ -1,0 +1,85 @@
+<%- include('../partials/header') %>
+
+<div class="container form-page">
+  <h1>Report a Sighting</h1>
+  <p class="form-sub">Spotted wildlife? Report it and earn <strong>10 conservation points</strong>. Verified sightings earn a bonus 15 points!</p>
+
+  <div class="form-card">
+    <form action="/sightings/report" method="POST">
+
+      <div class="form-row">
+        <div class="form-group">
+          <label>Species Name *</label>
+          <input type="text" name="species" placeholder="e.g. Bengal Tiger, Indian Elephant" required>
+        </div>
+        <div class="form-group">
+          <label>Number Seen</label>
+          <input type="number" name="count" value="1" min="1">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>Condition *</label>
+        <select name="condition" required>
+          <option value="Unknown">Unknown</option>
+          <option value="Healthy">Healthy</option>
+          <option value="Injured">Injured – needs help</option>
+          <option value="Dead">Dead</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>Location Description *</label>
+        <input type="text" name="location" placeholder="e.g. Kaziranga National Park, Assam" required>
+      </div>
+
+      <div class="form-group">
+        <label>Description *</label>
+        <textarea name="description" rows="3" placeholder="Describe what you saw — behavior, surroundings, time of day..." required></textarea>
+      </div>
+
+      <div class="form-group">
+        <label>Pin on Map <span class="optional">(click map to set exact coordinates)</span></label>
+        <div id="reportMap" style="height:280px;border-radius:10px;border:2px solid #ddd;margin-bottom:8px"></div>
+        <input type="hidden" name="lat" id="latInput">
+        <input type="hidden" name="lng" id="lngInput">
+        <p id="coordDisplay" style="font-size:0.82rem;color:var(--text-muted)">No pin placed yet — click the map above.</p>
+      </div>
+
+      <div class="form-group">
+        <label>Image URL <span class="optional">(optional)</span></label>
+        <input type="url" name="image" placeholder="https://example.com/photo.jpg">
+      </div>
+
+      <div style="background:#d8f3dc;border-radius:8px;padding:12px 16px;margin-bottom:1.2rem;font-size:0.88rem;color:#1b4332">
+        🌿 <strong>+10 points</strong> awarded on submission · <strong>+15 bonus points</strong> if an admin verifies your sighting
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">Submit Sighting</button>
+        <a href="/sightings" class="btn btn-outline">Cancel</a>
+      </div>
+    </form>
+  </div>
+</div>
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const map = L.map('reportMap').setView([20, 78], 4);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  let marker = null;
+  map.on('click', function(e) {
+    const { lat, lng } = e.latlng;
+    document.getElementById('latInput').value = lat.toFixed(6);
+    document.getElementById('lngInput').value = lng.toFixed(6);
+    document.getElementById('coordDisplay').textContent = `📍 Pinned: ${lat.toFixed(4)}, ${lng.toFixed(4)}`;
+    if (marker) map.removeLayer(marker);
+    marker = L.marker([lat, lng]).addTo(map);
+  });
+</script>
+
+<%- include('../partials/footer') %>

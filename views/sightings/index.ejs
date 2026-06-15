@@ -1,0 +1,120 @@
+<%- include('../partials/header') %>
+
+<div class="page-hero" style="background:linear-gradient(135deg,#0d2b1a,#1a4a2e)">
+  <div class="container">
+    <h1>🗺️ Wildlife <span class="accent">Sighting Map</span></h1>
+    <p>Live reports from conservationists around the world.</p>
+    <div style="display:flex;gap:1rem;justify-content:center;flex-wrap:wrap">
+      <% if (user) { %>
+        <a href="/sightings/report" class="btn btn-primary">+ Report Sighting</a>
+      <% } else { %>
+        <a href="/auth/login" class="btn btn-primary">Login to Report</a>
+      <% } %>
+    </div>
+  </div>
+</div>
+
+<div class="container" style="padding:2rem 2rem">
+  <!-- Stats bar -->
+  <div class="sighting-stats">
+    <div class="sstat"><span class="sstat-num"><%= sightings.length %></span><span class="sstat-label">Total Sightings</span></div>
+    <div class="sstat"><span class="sstat-num"><%= sightings.filter(s=>s.verified).length %></span><span class="sstat-label">Verified</span></div>
+    <div class="sstat"><span class="sstat-num"><%= sightings.filter(s=>s.condition==='Injured').length %></span><span class="sstat-label">Need Help</span></div>
+    <div class="sstat"><span class="sstat-num"><%= [...new Set(sightings.map(s=>s.species))].length %></span><span class="sstat-label">Species Spotted</span></div>
+  </div>
+
+  <!-- Map -->
+  <div class="map-wrap">
+    <div id="map"></div>
+    <div class="map-legend">
+      <div class="legend-item"><span style="background:#52b788;width:12px;height:12px;border-radius:50%;display:inline-block"></span> Healthy</div>
+      <div class="legend-item"><span style="background:#f4a261;width:12px;height:12px;border-radius:50%;display:inline-block"></span> Injured</div>
+      <div class="legend-item"><span style="background:#e63946;width:12px;height:12px;border-radius:50%;display:inline-block"></span> Dead</div>
+      <div class="legend-item"><span style="background:#aaa;width:12px;height:12px;border-radius:50%;display:inline-block"></span> Unknown</div>
+      <div class="legend-item"><span style="border:2px solid gold;width:12px;height:12px;border-radius:50%;display:inline-block"></span> Verified</div>
+    </div>
+  </div>
+
+  <!-- Sightings list -->
+  <div style="margin-top:2.5rem">
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:1.5rem">Recent Sightings</h2>
+    <% if (sightings.length === 0) { %>
+      <div class="empty-state"><div class="empty-icon">🦉</div><h3>No sightings yet</h3><p>Be the first to report a wildlife sighting!</p></div>
+    <% } else { %>
+      <div class="sightings-list">
+        <% sightings.forEach(s => { %>
+          <div class="sighting-card">
+            <div class="sighting-left">
+              <div class="condition-dot condition-<%= s.condition.toLowerCase() %>"></div>
+              <div>
+                <div class="sighting-species">
+                  <%= s.species %>
+                  <% if (s.verified) { %><span class="verified-badge">✓ Verified</span><% } %>
+                </div>
+                <div class="sighting-meta">📍 <%= s.location %> · Count: <%= s.count %> · <%= s.condition %></div>
+                <div class="sighting-desc"><%= s.description %></div>
+                <div class="sighting-footer">
+                  Reported by <strong><%= s.reportedBy ? s.reportedBy.username : 'Unknown' %></strong>
+                  · <%= s.createdAt.toDateString() %>
+                </div>
+              </div>
+            </div>
+            <% if (user && user.role === 'admin') { %>
+              <div class="sighting-actions">
+                <% if (!s.verified) { %>
+                  <form action="/sightings/<%= s._id %>/verify" method="POST">
+                    <button class="btn btn-sm btn-primary">Verify</button>
+                  </form>
+                <% } %>
+                <form action="/sightings/<%= s._id %>/delete" method="POST" onsubmit="return confirm('Remove sighting?')">
+                  <button class="btn btn-sm btn-danger">Delete</button>
+                </form>
+              </div>
+            <% } %>
+          </div>
+        <% }) %>
+      </div>
+    <% } %>
+  </div>
+</div>
+
+<!-- Leaflet map -->
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script>
+  const map = L.map('map').setView([20, 0], 2);
+  L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    attribution: '© OpenStreetMap contributors'
+  }).addTo(map);
+
+  const sightings = <%- sightingsJson %>;
+  const colors = { Healthy: '#52b788', Injured: '#f4a261', Dead: '#e63946', Unknown: '#999' };
+
+  sightings.forEach(s => {
+    if (s.lat && s.lng) {
+      const color = colors[s.condition] || '#999';
+      const marker = L.circleMarker([s.lat, s.lng], {
+        radius: 9,
+        fillColor: color,
+        color: s.verified ? 'gold' : '#fff',
+        weight: s.verified ? 3 : 1.5,
+        fillOpacity: 0.9
+      }).addTo(map);
+
+      marker.bindPopup(`
+        <div style="min-width:180px">
+          <strong style="font-size:1rem">${s.species}</strong>
+          ${s.verified ? '<span style="color:green;font-size:0.8rem"> ✓ Verified</span>' : ''}
+          <p style="margin:4px 0;font-size:0.85rem;color:#555">${s.description}</p>
+          <div style="font-size:0.8rem;color:#777">
+            📍 ${s.location}<br>
+            👥 Count: ${s.count} · ${s.condition}<br>
+            👤 ${s.reportedBy}
+          </div>
+        </div>
+      `);
+    }
+  });
+</script>
+
+<%- include('../partials/footer') %>
