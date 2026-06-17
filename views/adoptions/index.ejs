@@ -1,0 +1,107 @@
+<%- include('../partials/header') %>
+
+<div class="page-hero" style="background:linear-gradient(135deg,#1a2e1a,#2d5a1e)">
+  <div class="container">
+    <h1>💚 Adopt a <span class="accent">Species</span></h1>
+    <p>Sponsor an endangered species and directly fund its conservation. Every adoption earns you conservation points and a unique certificate.</p>
+  </div>
+</div>
+
+<div class="container page-content">
+
+  <!-- My Active Adoptions -->
+  <% if (myAdoptions.length > 0) { %>
+    <div style="margin-bottom:3rem">
+      <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:1.2rem">🎖️ My Sponsorships</h2>
+      <div class="adoptions-mine">
+        <% myAdoptions.forEach(a => { %>
+          <div class="adoption-mine-card">
+            <div class="adoption-species-img" style="background-image:url('<%= a.species.image %>')"></div>
+            <div class="adoption-mine-info">
+              <span class="status-badge status-<%= a.species.conservationStatus.toLowerCase().replace(/ /g,'-') %>"><%= a.species.conservationStatus %></span>
+              <h3><%= a.species.name %></h3>
+              <div class="adoption-tier-badge tier-<%= a.tier.toLowerCase() %>"><%= a.tier %> · $<%= a.amount %>/mo</div>
+              <div class="cert-id">📜 Certificate: <strong><%= a.certificate %></strong></div>
+              <div style="font-size:0.82rem;color:var(--text-muted)">Since <%= a.createdAt.toDateString() %></div>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+              <a href="/adoptions/<%= a._id %>/certificate" class="btn btn-sm btn-primary" target="_blank">📜 Certificate</a>
+              <form action="/adoptions/<%= a._id %>/cancel" method="POST" onsubmit="return confirm('Cancel this sponsorship?')">
+                <button class="btn btn-sm btn-danger">Cancel</button>
+              </form>
+            </div>
+          </div>
+        <% }) %>
+      </div>
+    </div>
+  <% } %>
+
+  <!-- Tier Cards -->
+  <div style="margin-bottom:3rem">
+    <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:0.5rem">Sponsorship Tiers</h2>
+    <p style="color:var(--text-muted);margin-bottom:1.5rem">Choose how you'd like to support conservation efforts.</p>
+    <div class="tiers-grid">
+      <% Object.entries(TIERS).forEach(([name, tier]) => { %>
+        <div class="tier-card" style="border-top:4px solid <%= tier.color %>">
+          <div class="tier-name" style="color:<%= tier.color %>"><%= name %></div>
+          <div class="tier-price">$<%= tier.amount %><span>/month</span></div>
+          <div class="tier-points">+<%= tier.points %> conservation points</div>
+          <ul class="tier-perks">
+            <% tier.perks.forEach(p => { %><li>✓ <%= p %></li><% }) %>
+          </ul>
+        </div>
+      <% }) %>
+    </div>
+  </div>
+
+  <!-- Species to adopt -->
+  <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;margin-bottom:1.5rem">Choose a Species to Sponsor</h2>
+  <% if (availableSpecies.length === 0) { %>
+    <div class="empty-state"><div class="empty-icon">🦁</div><h3>No species available yet</h3><p>Admins need to add approved species first.</p></div>
+  <% } else { %>
+    <div class="adopt-species-grid">
+      <% availableSpecies.forEach(sp => { %>
+        <% const alreadyAdopted = myAdoptions.some(a => a.species._id.toString() === sp._id.toString()) %>
+        <div class="adopt-species-card <%= alreadyAdopted ? 'already-adopted' : '' %>">
+          <div class="adopt-img" style="background-image:url('<%= sp.image %>')">
+            <span class="status-badge status-<%= sp.conservationStatus.toLowerCase().replace(/ /g,'-') %>" style="position:absolute;top:10px;left:10px"><%= sp.conservationStatus %></span>
+            <% if (alreadyAdopted) { %>
+              <div class="adopted-overlay">💚 You sponsor this species</div>
+            <% } %>
+            <% const sc = sponsorMap[sp._id.toString()] %>
+            <% if (sc) { %>
+              <div class="sponsor-count"><%= sc.count %> sponsor<%= sc.count !== 1 ? 's' : '' %></div>
+            <% } %>
+          </div>
+          <div class="adopt-body">
+            <h3><%= sp.name %></h3>
+            <p class="species-sci"><em><%= sp.scientificName || '' %></em></p>
+            <p class="adopt-habitat">🌍 <%= sp.habitat %></p>
+            <% if (!alreadyAdopted) { %>
+              <form action="/adoptions/adopt" method="POST" style="margin-top:1rem">
+                <input type="hidden" name="speciesId" value="<%= sp._id %>">
+                <div class="form-group" style="margin-bottom:0.8rem">
+                  <select name="tier" required style="width:100%;padding:8px;border:2px solid #ddd;border-radius:6px;font-family:inherit">
+                    <% Object.entries(TIERS).forEach(([tname, t]) => { %>
+                      <option value="<%= tname %>"><%= tname %> – $<%= t.amount %>/mo (+<%= t.points %>pts)</option>
+                    <% }) %>
+                  </select>
+                </div>
+                <div class="form-group" style="margin-bottom:0.8rem">
+                  <input type="text" name="message" placeholder="Optional message of support..." style="width:100%;padding:8px;border:2px solid #ddd;border-radius:6px;font-family:inherit">
+                </div>
+                <button type="submit" class="btn btn-primary btn-full">💚 Sponsor This Species</button>
+              </form>
+            <% } else { %>
+              <div style="margin-top:1rem;text-align:center;padding:10px;background:#d8f3dc;border-radius:8px;font-size:0.9rem;color:#1b4332;font-weight:600">
+                💚 Currently Sponsoring
+              </div>
+            <% } %>
+          </div>
+        </div>
+      <% }) %>
+    </div>
+  <% } %>
+</div>
+
+<%- include('../partials/footer') %>

@@ -1,0 +1,380 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title><%= title %></title>
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400;1,700&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: #f0f0f0;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem;
+    }
+
+    /* Print/Download action bar — hidden when printing */
+    .action-bar {
+      display: flex;
+      gap: 1rem;
+      margin-bottom: 2rem;
+      align-items: center;
+    }
+    .btn {
+      padding: 10px 24px;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+      border: 2px solid transparent;
+      font-family: inherit;
+    }
+    .btn-download { background: #2d6a4f; color: white; border-color: #2d6a4f; }
+    .btn-download:hover { background: #1a3a2a; }
+    .btn-back { background: transparent; color: #555; border-color: #ccc; }
+    .btn-back:hover { background: #eee; }
+    .action-tip { font-size: 0.85rem; color: #666; }
+
+    /* =====================
+       CERTIFICATE
+    ===================== */
+    .certificate {
+      width: 900px;
+      min-height: 620px;
+      background: white;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    }
+
+    /* Outer decorative border */
+    .cert-border {
+      position: absolute;
+      inset: 14px;
+      border: 3px solid <%= tierColor.primary %>;
+      pointer-events: none;
+      z-index: 10;
+    }
+    .cert-border::before {
+      content: '';
+      position: absolute;
+      inset: 5px;
+      border: 1px solid <%= tierColor.primary %>55;
+    }
+
+    /* Corner ornaments */
+    .corner {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+      z-index: 11;
+    }
+    .corner-tl { top: 8px;  left: 8px;  border-top: 4px solid <%= tierColor.primary %>; border-left: 4px solid <%= tierColor.primary %>; }
+    .corner-tr { top: 8px;  right: 8px; border-top: 4px solid <%= tierColor.primary %>; border-right: 4px solid <%= tierColor.primary %>; }
+    .corner-bl { bottom: 8px; left: 8px;  border-bottom: 4px solid <%= tierColor.primary %>; border-left: 4px solid <%= tierColor.primary %>; }
+    .corner-br { bottom: 8px; right: 8px; border-bottom: 4px solid <%= tierColor.primary %>; border-right: 4px solid <%= tierColor.primary %>; }
+
+    /* Background watermark */
+    .cert-watermark {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 18rem;
+      opacity: 0.025;
+      pointer-events: none;
+      z-index: 1;
+      user-select: none;
+    }
+
+    /* Left species image panel */
+    .cert-img-panel {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 260px;
+      background: url('<%= adoption.species.image %>') center/cover no-repeat;
+    }
+    .cert-img-panel::after {
+      content: '';
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to right, transparent 60%, white 100%),
+                  linear-gradient(to bottom, <%= tierColor.primary %>22 0%, transparent 30%);
+    }
+
+    /* Status ribbon on image */
+    .cert-status-ribbon {
+      position: absolute;
+      bottom: 30px;
+      left: 0;
+      background: <%= tierColor.primary %>;
+      color: white;
+      padding: 6px 16px 6px 12px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      clip-path: polygon(0 0, 100% 0, 92% 100%, 0 100%);
+      z-index: 5;
+    }
+
+    /* Main content area */
+    .cert-content {
+      margin-left: 240px;
+      padding: 40px 50px 40px 36px;
+      position: relative;
+      z-index: 5;
+      min-height: 620px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Header */
+    .cert-org {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin-bottom: 6px;
+    }
+    .cert-org-logo { font-size: 1.3rem; }
+    .cert-org-name {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      font-weight: 700;
+      color: #2d6a4f;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+    }
+
+    .cert-headline {
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 3px;
+      color: #999;
+      margin-bottom: 12px;
+    }
+
+    .cert-title {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.4rem;
+      font-weight: 900;
+      line-height: 1.1;
+      color: #1a1a1a;
+      margin-bottom: 6px;
+    }
+    .cert-title span { color: <%= tierColor.primary %>; }
+
+    .cert-subtitle {
+      font-size: 0.85rem;
+      color: #777;
+      margin-bottom: 20px;
+    }
+
+    /* Recipient */
+    .cert-presented {
+      font-size: 0.82rem;
+      color: #999;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 2px;
+    }
+    .cert-recipient {
+      font-family: 'Playfair Display', serif;
+      font-size: 2rem;
+      font-weight: 700;
+      font-style: italic;
+      color: #1a1a1a;
+      border-bottom: 2px solid <%= tierColor.primary %>;
+      padding-bottom: 6px;
+      margin-bottom: 16px;
+      display: inline-block;
+    }
+
+    /* Species info */
+    .cert-species-block {
+      background: <%= tierColor.secondary %>;
+      border-left: 4px solid <%= tierColor.primary %>;
+      border-radius: 0 8px 8px 0;
+      padding: 12px 16px;
+      margin-bottom: 20px;
+    }
+    .cert-species-block .label { font-size: 0.72rem; text-transform: uppercase; letter-spacing: 1px; color: #888; margin-bottom: 2px; }
+    .cert-species-name { font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700; color: #1a1a1a; }
+    .cert-species-sci  { font-style: italic; font-size: 0.88rem; color: #666; }
+
+    /* Tier badge */
+    .cert-tier {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: <%= tierColor.primary %>;
+      color: white;
+      padding: 5px 16px;
+      border-radius: 20px;
+      font-size: 0.82rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      margin-bottom: 20px;
+    }
+
+    /* Decorative divider */
+    .cert-divider {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 16px;
+      color: <%= tierColor.primary %>;
+      font-size: 0.9rem;
+    }
+    .cert-divider::before,
+    .cert-divider::after {
+      content: '';
+      flex: 1;
+      height: 1px;
+      background: <%= tierColor.primary %>44;
+    }
+
+    /* Footer meta */
+    .cert-footer {
+      margin-top: auto;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+      padding-top: 16px;
+      border-top: 1px solid #eee;
+    }
+    .cert-meta-item { font-size: 0.75rem; color: #999; }
+    .cert-meta-item strong { display: block; font-size: 0.82rem; color: #555; margin-top: 2px; }
+
+    .cert-seal {
+      width: 70px;
+      height: 70px;
+      border: 3px solid <%= tierColor.primary %>;
+      border-radius: 50%;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.55rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: <%= tierColor.primary %>;
+      text-align: center;
+      line-height: 1.4;
+    }
+    .cert-seal .seal-icon { font-size: 1.4rem; display: block; }
+
+    /* =====================
+       PRINT STYLES
+    ===================== */
+    @media print {
+      body {
+        background: white;
+        padding: 0;
+      }
+      .action-bar { display: none !important; }
+      .certificate {
+        box-shadow: none;
+        width: 100%;
+        page-break-inside: avoid;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Action bar -->
+  <div class="action-bar">
+    <button class="btn btn-download" onclick="window.print()">⬇️ Download / Print Certificate</button>
+    <a href="/adoptions" class="btn btn-back">← Back to Adoptions</a>
+    <span class="action-tip">💡 In the print dialog, choose "Save as PDF" to download</span>
+  </div>
+
+  <!-- Certificate -->
+  <div class="certificate">
+    <!-- Decorative elements -->
+    <div class="cert-border"></div>
+    <div class="corner corner-tl"></div>
+    <div class="corner corner-tr"></div>
+    <div class="corner corner-bl"></div>
+    <div class="corner corner-br"></div>
+    <div class="cert-watermark">🌿</div>
+
+    <!-- Species image panel -->
+    <div class="cert-img-panel">
+      <div class="cert-status-ribbon"><%= adoption.species.conservationStatus %></div>
+    </div>
+
+    <!-- Main content -->
+    <div class="cert-content">
+      <!-- Org header -->
+      <div class="cert-org">
+        <span class="cert-org-logo">🌿</span>
+        <span class="cert-org-name">WildGuard Conservation</span>
+      </div>
+
+      <div class="cert-headline">Official Sponsorship Certificate</div>
+
+      <div class="cert-title">
+        Certificate of<br><span>Conservation</span>
+      </div>
+      <div class="cert-subtitle">This certifies that the following individual has pledged to protect wildlife</div>
+
+      <!-- Recipient -->
+      <div class="cert-presented">Proudly presented to</div>
+      <div class="cert-recipient"><%= adoption.user.username %></div>
+
+      <!-- Tier -->
+      <div class="cert-tier"><%= tierColor.label %> Sponsor</div>
+
+      <!-- Species -->
+      <div class="cert-divider">🦁</div>
+      <div class="cert-species-block">
+        <div class="label">For sponsoring the species</div>
+        <div class="cert-species-name"><%= adoption.species.name %></div>
+        <% if (adoption.species.scientificName) { %>
+          <div class="cert-species-sci"><%= adoption.species.scientificName %></div>
+        <% } %>
+      </div>
+
+      <% if (adoption.message) { %>
+        <div style="font-style:italic;color:#666;font-size:0.88rem;margin-bottom:16px;padding:10px 14px;background:#f9f9f9;border-radius:6px">
+          "<%= adoption.message %>"
+        </div>
+      <% } %>
+
+      <!-- Footer -->
+      <div class="cert-footer">
+        <div class="cert-meta-item">
+          Certificate ID
+          <strong><%= adoption.certificate %></strong>
+        </div>
+        <div class="cert-meta-item">
+          Date Issued
+          <strong><%= adoption.createdAt.toDateString() %></strong>
+        </div>
+        <div class="cert-meta-item">
+          Sponsorship Tier
+          <strong><%= adoption.tier %> · $<%= adoption.amount %>/mo</strong>
+        </div>
+        <div class="cert-seal">
+          <span class="seal-icon">🌿</span>
+          WildGuard<br>Verified
+        </div>
+      </div>
+    </div>
+  </div>
+
+</body>
+</html>
