@@ -1,0 +1,81 @@
+<%- include('../partials/header') %>
+
+<div class="container admin-page">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
+    <div>
+      <h1 style="font-family:'Playfair Display',serif;font-size:2rem">Manage Species</h1>
+      <p style="color:var(--text-muted)">Review pending reports and manage the species directory.</p>
+    </div>
+    <a href="/admin" class="btn btn-outline btn-sm">← Dashboard</a>
+  </div>
+
+  <% if (pending.length > 0) { %>
+    <div class="admin-table-wrap" style="border-top:3px solid var(--orange)">
+      <div class="admin-table-header">
+        <h2>⏳ Pending Approvals (<%= pending.length %>)</h2>
+      </div>
+      <table>
+        <thead>
+          <tr><th>Species</th><th>Category</th><th>Status</th><th>Reported By</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <% pending.forEach(sp => { %>
+            <tr>
+              <td>
+                <strong><%= sp.name %></strong>
+                <br><small style="color:var(--text-muted)"><em><%= sp.scientificName || '—' %></em></small>
+              </td>
+              <td><%= sp.category %></td>
+              <td><span class="status-badge status-<%= sp.conservationStatus.toLowerCase().replace(/ /g,'-') %>"><%= sp.conservationStatus %></span></td>
+              <td><%= sp.addedBy ? sp.addedBy.username : 'Unknown' %></td>
+              <td style="display:flex;gap:6px">
+                <form action="/admin/species/<%= sp._id %>/approve" method="POST">
+                  <button class="btn btn-sm btn-primary">Approve</button>
+                </form>
+                <form action="/admin/species/<%= sp._id %>/delete" method="POST" onsubmit="return confirm('Reject and delete this report?')">
+                  <button class="btn btn-sm btn-danger">Reject</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+  <% } else { %>
+    <div class="admin-table-wrap" style="padding:2rem;text-align:center;color:var(--text-muted)">
+      <p>✅ No pending species reports.</p>
+    </div>
+  <% } %>
+
+  <div class="admin-table-wrap" style="margin-top:2rem">
+    <div class="admin-table-header">
+      <h2>✅ Approved Species (<%= approved.length %>)</h2>
+    </div>
+    <% if (approved.length === 0) { %>
+      <div style="padding:2rem;text-align:center;color:var(--text-muted)"><p>No approved species yet.</p></div>
+    <% } else { %>
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Category</th><th>Status</th><th>Added</th><th>Actions</th></tr>
+        </thead>
+        <tbody>
+          <% approved.forEach(sp => { %>
+            <tr>
+              <td><strong><%= sp.name %></strong></td>
+              <td><%= sp.category %></td>
+              <td><span class="status-badge status-<%= sp.conservationStatus.toLowerCase().replace(/ /g,'-') %>"><%= sp.conservationStatus %></span></td>
+              <td><%= sp.createdAt.toDateString() %></td>
+              <td>
+                <form action="/admin/species/<%= sp._id %>/delete" method="POST" onsubmit="return confirm('Remove this species?')">
+                  <button class="btn btn-sm btn-danger">Remove</button>
+                </form>
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    <% } %>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

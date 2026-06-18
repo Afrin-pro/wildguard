@@ -1,0 +1,67 @@
+<%- include('../partials/header') %>
+
+<div class="page-hero" style="background:linear-gradient(135deg,#1a1a2e,#16213e)">
+  <div class="container">
+    <h1>⚙️ Admin <span class="accent">Dashboard</span></h1>
+    <p>Manage events, species, and users across WildGuard.</p>
+  </div>
+</div>
+
+<div class="container admin-page">
+  <div class="admin-stats">
+    <div class="admin-stat-card">
+      <div class="num"><%= stats.users %></div>
+      <div class="label">Total Users</div>
+    </div>
+    <div class="admin-stat-card">
+      <div class="num"><%= stats.events %></div>
+      <div class="label">Active Events</div>
+    </div>
+    <div class="admin-stat-card">
+      <div class="num"><%= stats.approvedSpecies %></div>
+      <div class="label">Species Listed</div>
+    </div>
+    <div class="admin-stat-card" style="border-top:3px solid var(--orange)">
+      <div class="num" style="color:var(--orange)"><%= stats.pendingSpecies %></div>
+      <div class="label">Pending Approvals</div>
+    </div>
+  </div>
+
+  <div style="display:flex;gap:1rem;flex-wrap:wrap;margin-bottom:2rem">
+    <a href="/events/admin/create" class="btn btn-primary">+ Create Event</a>
+    <a href="/admin/species" class="btn btn-outline">Manage Species</a>
+    <a href="/admin/users" class="btn btn-outline">Manage Users</a>
+  </div>
+
+  <div class="admin-table-wrap">
+    <div class="admin-table-header">
+      <h2>Recent Users</h2>
+      <a href="/admin/users" class="btn btn-sm btn-outline">View All</a>
+    </div>
+    <table>
+      <thead>
+        <tr>
+          <th>User</th>
+          <th>Email</th>
+          <th>Role</th>
+          <th>Joined</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% recentUsers.forEach(u => { %>
+          <tr>
+            <td style="display:flex;align-items:center;gap:8px">
+              <img src="<%= u.avatar %>" style="width:28px;height:28px;border-radius:50%;object-fit:cover">
+              <strong><%= u.username %></strong>
+            </td>
+            <td><%= u.email %></td>
+            <td><span class="role-badge role-<%= u.role %>"><%= u.role %></span></td>
+            <td><%= u.createdAt.toDateString() %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>

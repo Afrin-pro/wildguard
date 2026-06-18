@@ -1,0 +1,52 @@
+<%- include('../partials/header') %>
+
+<div class="container admin-page">
+  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:2rem">
+    <div>
+      <h1 style="font-family:'Playfair Display',serif;font-size:2rem">Manage Users</h1>
+      <p style="color:var(--text-muted)"><%= users.length %> total registered users.</p>
+    </div>
+    <a href="/admin" class="btn btn-outline btn-sm">← Dashboard</a>
+  </div>
+
+  <div class="admin-table-wrap">
+    <table>
+      <thead>
+        <tr><th>User</th><th>Email</th><th>Role</th><th>Joined</th><th>Actions</th></tr>
+      </thead>
+      <tbody>
+        <% users.forEach(u => { %>
+          <tr>
+            <td>
+              <div style="display:flex;align-items:center;gap:10px">
+                <img src="<%= u.avatar %>" alt="" style="width:36px;height:36px;border-radius:50%;object-fit:cover;border:2px solid var(--green-accent)">
+                <div>
+                  <strong><%= u.username %></strong>
+                  <% if (u._id.toString() === user._id.toString()) { %>
+                    <span style="font-size:0.75rem;color:var(--text-muted)"> (you)</span>
+                  <% } %>
+                </div>
+              </div>
+            </td>
+            <td style="color:var(--text-muted)"><%= u.email %></td>
+            <td><span class="role-badge role-<%= u.role %>"><%= u.role %></span></td>
+            <td style="color:var(--text-muted)"><%= u.createdAt.toDateString() %></td>
+            <td>
+              <% if (u._id.toString() !== user._id.toString()) { %>
+                <form action="/admin/users/<%= u._id %>/toggle-role" method="POST" onsubmit="return confirm('Change role for <%= u.username %>?')">
+                  <button class="btn btn-sm <%= u.role === 'admin' ? 'btn-danger' : 'btn-outline' %>">
+                    <%= u.role === 'admin' ? 'Remove Admin' : 'Make Admin' %>
+                  </button>
+                </form>
+              <% } else { %>
+                <span style="font-size:0.82rem;color:var(--text-muted)">—</span>
+              <% } %>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<%- include('../partials/footer') %>
