@@ -19,7 +19,7 @@
 
 <br/>
 
-[🌐 Live Demo](https://wildguard.onrender.com) &nbsp;·&nbsp;
+[🌐 Live Demo](https://wildguard-rn12.onrender.com) &nbsp;·&nbsp;
 [🚀 Deploy Your Own](#-deployment-on-render) &nbsp;·&nbsp;
 [🛠️ Local Setup](#-local-setup) &nbsp;·&nbsp;
 [📸 Features](#-features)
