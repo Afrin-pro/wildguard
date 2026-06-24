@@ -565,6 +565,6 @@ This project is licensed under the **MIT License** — free to use, modify, and 
 
 <br/>
 
-[![Star this repo](https://img.shields.io/github/stars/YOUR_USERNAME/wildguard?style=social)](https://github.com/YOUR_USERNAME/wildguard)
+
 
 </div>
