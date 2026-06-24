@@ -364,7 +364,7 @@ https://your-app-name.onrender.com
 
 > **Auto-deploy:** Every `git push` to `main` triggers a new deployment automatically.
 
-> 🟢 **Always Online:** App is monitored every 5 minutes by [UptimeRobot](https://uptimerobot.com) to prevent Render free tier sleep.
+> 🟢 **Always Online:** App is monitored every 9 minutes by [UptimeRobot](https://uptimerobot.com) to prevent Render free tier sleep.
 
 ---
 
